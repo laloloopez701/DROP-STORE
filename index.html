@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DROP-STORE — Luxury & Hype</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --deep: #0d0d0d;
+    --purple: #7B2FBE;
+    --purple-light: #9B59D4;
+    --pink: #E040A0;
+    --pink-soft: #F472C0;
+    --white: #F5F0FF;
+    --gray: #aaa;
+    --card-bg: #111118;
+    --border: rgba(123,47,190,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  ::selection { background: var(--purple); color: var(--white); }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom Cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--pink);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 99999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: exclusion;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--purple-light);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 99998;
+    transition: transform 0.35s cubic-bezier(.22,1,.36,1), width 0.25s, height 0.25s;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.35;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 4rem;
+    background: rgba(8,8,8,0.82);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.18em;
+    background: linear-gradient(135deg, var(--purple-light), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none; color: var(--gray);
+    font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-right { display: flex; align-items: center; gap: 1.4rem; }
+
+  .nav-cart {
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; color: white;
+    padding: 0.55rem 1.5rem;
+    border-radius: 50px; font-size: 0.82rem;
+    letter-spacing: 0.08em; font-family: 'DM Sans', sans-serif;
+    cursor: none; font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .nav-cart:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(228,64,160,0.4); }
+
+  /* ---- HERO ---- */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    padding-top: 90px;
+    text-align: center;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,47,190,0.22) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    animation: pulse 5s ease-in-out infinite;
+  }
+  .hero-glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(224,64,160,0.15) 0%, transparent 70%);
+    top: 30%; left: 65%;
+    animation: pulse 7s ease-in-out infinite reverse;
+  }
+
+  @keyframes pulse {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%,-50%) scale(1.15); opacity: 0.7; }
+  }
+
+  .hero-tag {
+    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--pink); margin-bottom: 1.5rem;
+    border: 1px solid rgba(224,64,160,0.35);
+    padding: 0.4rem 1.2rem; border-radius: 50px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 13rem);
+    line-height: 0.88;
+    letter-spacing: 0.04em;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(245,240,255,0.5) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: fadeUp 0.9s 0.1s ease both;
+    position: relative; z-index: 1;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, var(--purple-light), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-style: italic; font-family: 'Playfair Display', serif;
+  }
+
+  .hero-sub {
+    font-size: 1.05rem; color: var(--gray); margin-top: 1.8rem;
+    max-width: 500px; line-height: 1.7;
+    animation: fadeUp 1s 0.2s ease both;
+  }
+
+  .hero-btns {
+    display: flex; gap: 1rem; margin-top: 2.5rem;
+    animation: fadeUp 1s 0.3s ease both;
+  }
+
+  .btn-primary {
+    padding: 0.85rem 2.4rem;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; color: white; border-radius: 50px;
+    font-size: 0.9rem; font-weight: 600; letter-spacing: 0.06em;
+    cursor: none; transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 30px rgba(123,47,190,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(224,64,160,0.5); }
+
+  .btn-ghost {
+    padding: 0.85rem 2.4rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white); border-radius: 50px;
+    font-size: 0.9rem; font-weight: 500; letter-spacing: 0.06em;
+    cursor: none; transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-ghost:hover { border-color: var(--purple-light); background: rgba(123,47,190,0.1); }
+
+  .hero-scroll {
+    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; letter-spacing: 0.15em; color: var(--gray); text-transform: uppercase;
+    animation: fadeUp 1s 0.6s ease both;
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--purple), transparent);
+    animation: scrollAnim 2s ease-in-out infinite;
+  }
+  @keyframes scrollAnim { 0%,100%{opacity:1;transform:scaleY(1)} 50%{opacity:0.4;transform:scaleY(0.6)} }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- MARQUEE ---- */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    background: rgba(123,47,190,0.05);
+  }
+  .marquee-track {
+    display: flex; gap: 3rem;
+    animation: marquee 22s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.15rem; letter-spacing: 0.2em;
+    color: var(--gray); white-space: nowrap;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .marquee-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* ---- BRANDS SECTION ---- */
+  .section { padding: 7rem 4rem; }
+  .section-label {
+    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--pink); margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1; letter-spacing: 0.04em;
+    margin-bottom: 3.5rem;
+  }
+
+  .brands-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    border: 1px solid var(--border);
+  }
+
+  .brand-card {
+    background: var(--card-bg);
+    padding: 2.5rem 1.5rem;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s, transform 0.3s;
+    position: relative; overflow: hidden;
+    cursor: none;
+  }
+  .brand-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(123,47,190,0.08), rgba(224,64,160,0.08));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .brand-card:hover::before { opacity: 1; }
+  .brand-card:hover { transform: translateY(-3px); }
+
+  .brand-logo-circle {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    position: relative; z-index: 1;
+  }
+  .brand-card:hover .brand-logo-circle {
+    border-color: var(--purple);
+    box-shadow: 0 0 20px rgba(123,47,190,0.3);
+  }
+
+  .brand-name {
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gray); text-align: center;
+    position: relative; z-index: 1;
+    transition: color 0.3s;
+  }
+  .brand-card:hover .brand-name { color: var(--white); }
+
+  /* Brand specific colors */
+  .b-lv { background: linear-gradient(135deg, #8B6F47, #C4A265); color: white; }
+  .b-ch { background: linear-gradient(135deg, #1a1a1a, #444); color: white; font-size: 0.75rem; }
+  .b-cl { background: linear-gradient(135deg, #C0392B, #E74C3C); color: white; }
+  .b-es { background: linear-gradient(135deg, #2c2c2c, #555); color: white; }
+  .b-fg { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; }
+  .b-bl { background: linear-gradient(135deg, #000, #333); color: white; }
+  .b-dg { background: linear-gradient(135deg, #1a3a5c, #2e5d9e); color: white; }
+  .b-ow { background: linear-gradient(135deg, #222, #555); color: white; }
+  .b-di { background: linear-gradient(135deg, #1a1a1a, #3d3d3d); color: white; }
+  .b-fe { background: linear-gradient(135deg, #8B5E3C, #C4864F); color: white; }
+
+  /* ---- PRODUCTS SECTION ---- */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: none;
+    transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s;
+    position: relative;
+  }
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(123,47,190,0.25), 0 0 0 1px var(--purple);
+  }
+
+  .product-img {
+    width: 100%; height: 320px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    font-size: 5rem;
+  }
+
+  .product-img-bg {
+    position: absolute; inset: 0;
+    transition: transform 0.5s ease;
+  }
+  .product-card:hover .product-img-bg { transform: scale(1.06); }
+
+  .product-badge {
+    position: absolute; top: 1rem; left: 1rem;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    font-size: 0.65rem; letter-spacing: 0.1em;
+    padding: 0.3rem 0.8rem; border-radius: 50px;
+    font-weight: 600;
+  }
+
+  .product-wishlist {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(8,8,8,0.7); backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .product-wishlist:hover { background: rgba(224,64,160,0.2); border-color: var(--pink); }
+
+  .product-info { padding: 1.4rem; }
+  .product-brand {
+    font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--purple-light); margin-bottom: 0.4rem;
+  }
+  .product-name {
+    font-size: 1rem; font-weight: 500; margin-bottom: 0.8rem;
+    line-height: 1.3;
+  }
+  .product-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 1rem;
+  }
+  .product-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem; letter-spacing: 0.05em;
+    background: linear-gradient(135deg, var(--white), var(--gray));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .btn-add {
+    padding: 0.55rem 1.3rem;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; color: white; border-radius: 50px;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em;
+    cursor: none; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-add:hover { box-shadow: 0 4px 20px rgba(224,64,160,0.5); transform: scale(1.05); }
+
+  /* ---- FEATURED BANNER ---- */
+  .featured-banner {
+    margin: 0 4rem;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    height: 420px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+  }
+  .featured-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0a001a 0%, #1a0033 40%, #2d0052 70%, #0d001a 100%);
+  }
+  .featured-grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(123,47,190,0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(123,47,190,0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .featured-glow {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,47,190,0.3) 0%, transparent 60%);
+    right: -100px; top: -100px;
+  }
+  .featured-content {
+    position: relative; z-index: 1;
+    text-align: center;
+  }
+  .featured-tag {
+    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--pink-soft); margin-bottom: 1rem;
+    display: inline-block;
+  }
+  .featured-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 7vw, 6rem);
+    letter-spacing: 0.06em; line-height: 0.9;
+    margin-bottom: 1.5rem;
+  }
+  .featured-title em {
+    color: var(--pink);
+    font-style: normal;
+  }
+
+  /* ---- DROPS / NEW ARRIVALS ---- */
+  .drops-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .drop-main {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+    position: relative; cursor: none;
+    transition: box-shadow 0.3s;
+  }
+  .drop-main:hover { box-shadow: 0 0 0 1px var(--purple), 0 20px 60px rgba(123,47,190,0.2); }
+  .drop-main-img {
+    height: 480px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8rem; position: relative; overflow: hidden;
+  }
+  .drop-small {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+    display: flex; flex-direction: column;
+    cursor: none; transition: box-shadow 0.3s;
+  }
+  .drop-small:hover { box-shadow: 0 0 0 1px var(--purple), 0 10px 40px rgba(123,47,190,0.2); }
+  .drop-small-img {
+    height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; flex: 1;
+    position: relative; overflow: hidden;
+  }
+  .drop-info { padding: 1.2rem; }
+  .drop-info .product-brand { margin-bottom: 0.3rem; }
+  .drop-info .product-name { font-size: 0.92rem; }
+
+  /* ---- NEWSLETTER ---- */
+  .newsletter {
+    margin: 0 4rem 7rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(123,47,190,0.12), rgba(224,64,160,0.08));
+    border: 1px solid var(--border);
+    padding: 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 3rem;
+  }
+  .newsletter-text .section-label { margin-bottom: 0.6rem; }
+  .newsletter-text h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem; letter-spacing: 0.06em; line-height: 1;
+  }
+  .newsletter-text p { color: var(--gray); margin-top: 0.8rem; font-size: 0.95rem; }
+  .newsletter-form {
+    display: flex; gap: 0.8rem; flex-shrink: 0;
+  }
+  .newsletter-input {
+    padding: 0.85rem 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 50px; color: var(--white);
+    font-size: 0.9rem; font-family: 'DM Sans', sans-serif;
+    width: 280px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .newsletter-input::placeholder { color: var(--gray); }
+  .newsletter-input:focus { border-color: var(--purple); }
+
+  /* ---- FOOTER ---- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem; letter-spacing: 0.18em;
+    background: linear-gradient(135deg, var(--purple-light), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-links { display: flex; gap: 2rem; }
+  .footer-links a { color: var(--gray); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--white); }
+  .footer-copy { font-size: 0.75rem; color: var(--gray); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 2px; }
+
+  /* Responsive helpers */
+  @media (max-width: 1100px) {
+    nav { padding: 1.2rem 2rem; }
+    .nav-links { display: none; }
+    .section { padding: 5rem 2rem; }
+    .brands-grid { grid-template-columns: repeat(3, 1fr); }
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured-banner, .newsletter { margin: 0 2rem; }
+    .drops-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .products-grid, .brands-grid, .drops-grid { grid-template-columns: 1fr; }
+    .newsletter { flex-direction: column; }
+    .newsletter-form { flex-direction: column; width: 100%; }
+    .newsletter-input { width: 100%; }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+  }
+
+  /* Product image gradients */
+  .img-lv { background: linear-gradient(135deg, #1a0f00, #3d2600); }
+  .img-ch { background: linear-gradient(135deg, #0a0a0a, #1f1f1f); }
+  .img-bl { background: linear-gradient(135deg, #050505, #1a1a1a); }
+  .img-di { background: linear-gradient(135deg, #0a0014, #1a0033); }
+  .img-ow { background: linear-gradient(135deg, #0d0d0d, #252525); }
+  .img-es { background: linear-gradient(135deg, #0a0a0a, #1c1c1c); }
+  .img-fe { background: linear-gradient(135deg, #1a0a00, #3d1a00); }
+  .img-dg { background: linear-gradient(135deg, #00081a, #001433); }
+
+  /* Glow accent lines */
+  .accent-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple), var(--pink), transparent);
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">DROP⊹STORE</div>
+  <ul class="nav-links">
+    <li><a href="#brands">Marcas</a></li>
+    <li><a href="#products">Catálogo</a></li>
+    <li><a href="#drops">New Drops</a></li>
+    <li><a href="#">Sneakers</a></li>
+    <li><a href="#">Accesorios</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-cart">🛒 Carrito (0)</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-tag">✦ New Collection 2025 ✦</div>
+  <h1 class="hero-title">DROP<br><span>STORE</span></h1>
+  <p class="hero-sub">Ropa de diseñador original. Hype auténtico. Estilo sin límites para la generación que define la moda.</p>
+  <div class="hero-btns">
+    <button class="btn-primary">Explorar Catálogo</button>
+    <button class="btn-ghost">Ver Nuevos Drops</button>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <!-- Track 1 -->
+    <div class="marquee-item">LOUIS VUITTON<div class="marquee-dot"></div></div>
+    <div class="marquee-item">CHROME HEARTS<div class="marquee-dot"></div></div>
+    <div class="marquee-item">LOUBOUTIN<div class="marquee-dot"></div></div>
+    <div class="marquee-item">ESSENTIALS<div class="marquee-dot"></div></div>
+    <div class="marquee-item">FEAR OF GOD<div class="marquee-dot"></div></div>
+    <div class="marquee-item">BALENCIAGA<div class="marquee-dot"></div></div>
+    <div class="marquee-item">DOLCE & GABBANA<div class="marquee-dot"></div></div>
+    <div class="marquee-item">OFF-WHITE<div class="marquee-dot"></div></div>
+    <div class="marquee-item">DIOR<div class="marquee-dot"></div></div>
+    <div class="marquee-item">FERRAGAMO<div class="marquee-dot"></div></div>
+    <!-- Track 2 (duplicate for seamless loop) -->
+    <div class="marquee-item">LOUIS VUITTON<div class="marquee-dot"></div></div>
+    <div class="marquee-item">CHROME HEARTS<div class="marquee-dot"></div></div>
+    <div class="marquee-item">LOUBOUTIN<div class="marquee-dot"></div></div>
+    <div class="marquee-item">ESSENTIALS<div class="marquee-dot"></div></div>
+    <div class="marquee-item">FEAR OF GOD<div class="marquee-dot"></div></div>
+    <div class="marquee-item">BALENCIAGA<div class="marquee-dot"></div></div>
+    <div class="marquee-item">DOLCE & GABBANA<div class="marquee-dot"></div></div>
+    <div class="marquee-item">OFF-WHITE<div class="marquee-dot"></div></div>
+    <div class="marquee-item">DIOR<div class="marquee-dot"></div></div>
+    <div class="marquee-item">FERRAGAMO<div class="marquee-dot"></div></div>
+  </div>
+</div>
+
+<!-- BRANDS -->
+<section class="section" id="brands">
+  <div class="section-label">✦ Nuestras Marcas</div>
+  <h2 class="section-title">LAS MARCAS<br>MÁS HYPE</h2>
+  <div class="brands-grid">
+    <div class="brand-card">
+      <div class="brand-logo-circle b-lv">LV</div>
+      <div class="brand-name">Louis Vuitton</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-ch" style="font-size:0.65rem">CHROME<br>HEARTS</div>
+      <div class="brand-name">Chrome Hearts</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-cl">CL</div>
+      <div class="brand-name">Louboutin</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-es">ESS</div>
+      <div class="brand-name">Essentials</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-fg">FOG</div>
+      <div class="brand-name">Fear Of God</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-bl">BAL</div>
+      <div class="brand-name">Balenciaga</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-dg">D&G</div>
+      <div class="brand-name">Dolce & Gabbana</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-ow" style="font-size:0.75rem">OFF<br>WHITE</div>
+      <div class="brand-name">Off-White</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-di">DIOR</div>
+      <div class="brand-name">Dior</div>
+    </div>
+    <div class="brand-card">
+      <div class="brand-logo-circle b-fe">FE</div>
+      <div class="brand-name">Ferragamo</div>
+    </div>
+  </div>
+</section>
+
+<div class="accent-line"></div>
+
+<!-- PRODUCTS -->
+<section class="section" id="products">
+  <div class="section-label">✦ Catálogo</div>
+  <h2 class="section-title">PIEZAS<br>SELECCIONADAS</h2>
+  <div class="products-grid">
+
+    <div class="product-card">
+      <div class="product-img img-lv">
+        <div class="product-img-bg img-lv" style="position:absolute;inset:0"></div>
+        <span style="position:relative;z-index:1;font-size:4rem;filter:drop-shadow(0 0 20px rgba(196,162,101,0.5))">👜</span>
+        <div class="product-badge">BESTSELLER</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Louis Vuitton</div>
+        <div class="product-name">Monogram Keepall 55 Travel Bag</div>
+        <div class="product-footer">
+          <div class="product-price">$3,200 USD</div>
+          <button class="btn-add">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img img-bl">
+        <div class="product-img-bg img-bl" style="position:absolute;inset:0"></div>
+        <span style="position:relative;z-index:1;font-size:4rem;filter:drop-shadow(0 0 20px rgba(255,255,255,0.2))">👟</span>
+        <div class="product-badge">HYPE</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Balenciaga</div>
+        <div class="product-name">Triple S Sneakers Black/White</div>
+        <div class="product-footer">
+          <div class="product-price">$1,150 USD</div>
+          <button class="btn-add">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img img-di">
+        <div class="product-img-bg img-di" style="position:absolute;inset:0"></div>
+        <span style="position:relative;z-index:1;font-size:4rem;filter:drop-shadow(0 0 20px rgba(123,47,190,0.5))">🕶️</span>
+        <div class="product-badge">NUEVO</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Dior</div>
+        <div class="product-name">CD Diamond Aviator Sunglasses</div>
+        <div class="product-footer">
+          <div class="product-price">$890 USD</div>
+          <button class="btn-add">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img img-ch">
+        <div class="product-img-bg img-ch" style="position:absolute;inset:0"></div>
+        <span style="position:relative;z-index:1;font-size:4rem;filter:drop-shadow(0 0 20px rgba(200,200,200,0.3))">💍</span>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Chrome Hearts</div>
+        <div class="product-name">Gothic Cross Silver Ring</div>
+        <div class="product-footer">
+          <div class="product-price">$620 USD</div>
+          <button class="btn-add">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img img-ow">
+        <div class="product-img-bg img-ow" style="position:absolute;inset:0"></div>
+        <span style="position:relative;z-index:1;font-size:4rem">👕</span>
+        <div class="product-badge">HYPE</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Off-White</div>
+        <div class="product-name">Diagonal Logo Oversized Hoodie</div>
+        <div class="product-footer">
+          <div class="product-price">$780 USD</div>
+          <button class="btn-add">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img img-cl" style="background: linear-gradient(135deg, #1a0000, #3d0000)">
+        <div class="product-img-bg" style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0000,#3d0000)"></div>
+        <span style="position:relative;z-index:1;font-size:4rem;filter:drop-shadow(0 0 20px rgba(192,57,43,0.5))">👠</span>
+        <div class="product-badge">ICONIC</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Christian Louboutin</div>
+        <div class="product-name">So Kate 120mm Pumps Red Sole</div>
+        <div class="product-footer">
+          <div class="product-price">$1,295 USD</div>
+          <button class="btn-add">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURED BANNER -->
+<div class="featured-banner">
+  <div class="featured-bg"></div>
+  <div class="featured-grid-lines"></div>
+  <div class="featured-glow"></div>
+  <div class="featured-content">
+    <div class="featured-tag">✦ Drop Exclusivo ✦</div>
+    <h2 class="featured-title">FEAR OF GOD<br><em>ESSENTIALS</em><br>SS25</h2>
+    <button class="btn-primary" style="margin-top:0.5rem">Ver Colección Completa →</button>
+  </div>
+</div>
+
+<div style="height:7rem"></div>
+
+<!-- NEW DROPS -->
+<section class="section" id="drops" style="padding-top:0">
+  <div class="section-label">✦ Recién Llegado</div>
+  <h2 class="section-title">NUEVOS<br>DROPS</h2>
+  <div class="drops-grid">
+
+    <div class="drop-main">
+      <div class="drop-main-img img-dg">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#00081a,#001433)"></div>
+        <span style="position:relative;z-index:1;font-size:7rem">🥋</span>
+        <div class="product-badge">DROP EXCLUSIVO</div>
+      </div>
+      <div class="drop-info" style="padding:1.8rem">
+        <div class="product-brand">Dolce & Gabbana</div>
+        <div class="product-name" style="font-size:1.2rem">Re-Edition Rhinestone Satin Jacket — Edición Limitada 2025</div>
+        <div class="product-footer" style="margin-top:1.5rem">
+          <div class="product-price">$4,800 USD</div>
+          <button class="btn-add">Agregar al Carrito</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+      <div class="drop-small">
+        <div class="drop-small-img img-es">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0a0a0a,#1c1c1c)"></div>
+          <span style="position:relative;z-index:1;font-size:4rem">🧢</span>
+          <div class="product-badge" style="top:0.8rem;left:0.8rem">NEW</div>
+        </div>
+        <div class="drop-info">
+          <div class="product-brand">Essentials</div>
+          <div class="product-name">Core Collection Snapback Cap</div>
+          <div class="product-footer" style="margin-top:0.8rem">
+            <div class="product-price">$95 USD</div>
+            <button class="btn-add">Agregar</button>
+          </div>
+        </div>
+      </div>
+      <div class="drop-small">
+        <div class="drop-small-img img-fe">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0a00,#3d1a00)"></div>
+          <span style="position:relative;z-index:1;font-size:4rem">👞</span>
+          <div class="product-badge" style="top:0.8rem;left:0.8rem">HOT</div>
+        </div>
+        <div class="drop-info">
+          <div class="product-brand">Ferragamo</div>
+          <div class="product-name">Gancini Bit Loafers — Caramelo</div>
+          <div class="product-footer" style="margin-top:0.8rem">
+            <div class="product-price">$980 USD</div>
+            <button class="btn-add">Agregar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="accent-line"></div>
+
+<!-- NEWSLETTER -->
+<div class="newsletter">
+  <div class="newsletter-text">
+    <div class="section-label">✦ Stay Updated</div>
+    <h2>PRIMERO EN SABER<br>LOS DROPS</h2>
+    <p>Suscríbete y recibe acceso anticipado a nuevas colecciones, drops exclusivos y precios especiales.</p>
+  </div>
+  <div class="newsletter-form">
+    <input class="newsletter-input" type="email" placeholder="Tu correo electrónico" />
+    <button class="btn-primary">Suscribirse</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">DROP⊹STORE</div>
+  <div class="footer-links">
+    <a href="#">Nosotros</a>
+    <a href="#">Envíos</a>
+    <a href="#">Devoluciones</a>
+    <a href="#">Autenticidad</a>
+    <a href="#">Contacto</a>
+  </div>
+  <div class="footer-copy">© 2025 Drop-Store. Todos los derechos reservados.</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('button, a, .brand-card, .product-card, .drop-main, .drop-small').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform += ' scale(1.8)';
+      ring.style.width = '56px';
+      ring.style.height = '56px';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+    });
+  });
+
+  // Cart counter
+  let cartCount = 0;
+  const cartBtn = document.querySelector('.nav-cart');
+  document.querySelectorAll('.btn-add').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cartCount++;
+      cartBtn.textContent = `🛒 Carrito (${cartCount})`;
+      btn.textContent = '✓ Agregado';
+      btn.style.background = 'linear-gradient(135deg, #2d7a2d, #4caf50)';
+      setTimeout(() => {
+        btn.textContent = 'Agregar';
+        btn.style.background = '';
+      }, 1500);
+    });
+  });
+
+  // Wishlist toggle
+  document.querySelectorAll('.product-wishlist').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
+      btn.style.color = btn.textContent === '♥' ? '#e040a0' : '';
+      btn.style.borderColor = btn.textContent === '♥' ? '#e040a0' : '';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.product-card, .brand-card, .drop-main, .drop-small').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
